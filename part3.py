@@ -51,7 +51,6 @@ from pyspark.sql import SparkSession
 from pyspark.errors import PySparkRuntimeError
 import os, sys
 
-# 1. Import-safe Spark init
 try:
     spark = SparkSession.builder.appName("hw2").getOrCreate()
     sc = spark.sparkContext
@@ -59,12 +58,10 @@ except PySparkRuntimeError:
     spark = None
     sc = None
 
-# 2. Add part1.py to workers
 if sc is not None:
     part1_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "part1.py")
     sc.addPyFile(part1_path)
 
-# 3. Safe import
 from part1 import *
 
 
@@ -90,8 +87,6 @@ def PART_1_PIPELINE_PARAMETRIC(N, P):
     q16a_out = q16_a()
     q16b_out = q16_b()
     q16c_out = q16_c()
-
-    # Question 20
     q20_out = q20()
 
     return {
@@ -285,6 +280,7 @@ class LatencyHelper:
         plt.savefig(filename)
         plt.close()
         # raise NotImplementedError
+
 # Insert code to generate plots here as needed
 os.makedirs('output', exist_ok=True)
 NUM_RUNS = 1
