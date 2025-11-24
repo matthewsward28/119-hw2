@@ -1,21 +1,5 @@
-Reflection
+Q1: Given only the dataflow graph, given a fixed level of parallelism, we would expect a linear relationship between latency and the input size. Each unit we are processing should have a given time that it takes, and doubling the amount of units should in theory double the total time. Because of this, throughput should stay pretty constant. When we double data parallelism, the workload should be split between double the amount of workers. This would cause the latency to be cut in half, as the units could be processed in half the total time. On top of this, the throughput would double, as twice as many units would be being processed at one time.
 
-Given only the dataflow graph, given a fixed level of parallelism, we would expect a linear relationship between latency and the input size. 
-Each unit we are processing should have a given time that it takes, and doubling the amount of units should in theory double the total time.
-Because of this, throughput should stay pretty constant. When we double data parallelism, the workload should be split between double the amount of workers.
-This would cause the latency to be cut in half, as the units could be processed in half the total time.
-On top of this, the throughput would double, as twice as many units would be being processed at one time.
+Q2: In practice, the expectation from question 1 does not always match the actual measurements. Actual performance has a more complex relationship between input size and parallelism, particularly at the extreme ends of the two. For P = 4, the observed latency for N = 10 was 1000ms, but for N = 1,000,000 it was 12,000ms. The observed ratio is much smaller than expected due to fixed runtimes. The throughput at N = 10 was so small as to not be visible on the graph, while at N = 1,000,000 it was 160,000 items/sec. The increase in throughput when doubling P was less than the expected double. Increasing parallelsim from 8 to 16 at N = 100,000 kept throughput at around 100,000 items per second, demonstrating some kind of inefficiency. 
 
-In practice, the expectation from question 1 does not always match the actual measurements.
-Actual performance has a more complex relationship between input size and parallelism, particularly at the extreme ends of the two.
-For P = 4, the observed latency for N = 10 was 1000ms, but for N = 1,000,000 it was 12,000ms.
-The observed ratio is much smaller than expected due to fixed runtimes.
-The throughput at N = 10 was so small as to not be visible on the graph, while at N = 1,000,000 it was 160,000 items/sec.
-The increase in throughput when doubling P was less than the expected double.
-Increasing parallelsim from 8 to 16 at N = 100,000 kept throughput at around 100,000 items per second, demonstrating some kind of inefficiency. 
-
-I conjecture that fixed startup costs ruin performance for smaller input sizes, like N<1,000.
-I also conjecture that communication and coordination inefficiencies limit scalability at extreme levels of parallelism, such as P = 8 and P = 16.
-These conjectures come from the difference between the theoretical model and the observations of my pipeline's performance.
-The theoretical model only accounts for computation time, and does not represent the reality of the runtime environment.
-Writing data to disk and transferring it to the next stage adds time that is unaccounted for, limiting the benefit of higher parallelism. 
+Q3: I conjecture that fixed startup costs ruin performance for smaller input sizes, like N <= 1,000. I also conjecture that communication and coordination inefficiencies limit scalability at extreme levels of parallelism, such as P = 8 and P = 16. These conjectures come from the difference between the theoretical model and the observations of my pipeline's performance. The theoretical model only accounts for computation time, and does not represent the reality of the runtime environment. Writing data to disk and transferring it to the next stage adds time that is unaccounted for, limiting the benefit of higher parallelism. 
